@@ -49,7 +49,7 @@ const linksList = [
   {
     title: 'Unos pacijenta',
     caption: 'Dio',
-    icon: 'icon',
+    icon: 'school',
     link: '/#/unospacijenta',
   },
   {
