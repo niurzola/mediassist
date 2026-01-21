@@ -1,0 +1,24 @@
+const routes = [
+  {
+    path: '/',
+    component: () => import('layouts/MainLayout.vue'),
+    children:[{ path: '', component: () => import('pages/IndexPage.vue') },
+              { path: 'Registracija', component: () => import('pages/RegistracijaPage.vue') },
+              { path: 'Mjerenja', component: () => import('pages/MjerenjaPage.vue') },
+              { path: 'Recepti', component: () => import('pages/ReceptiPage.vue') },
+              { path: 'Pacijenti', component: () => import('pages/PregledPacijenta.vue') },
+              { path: 'unospacijenta', component: () => import('pages/UnosPacijenta.vue') },
+              { path: 'loginPage', component: () => import('pages/loginPage.vue') }
+
+    ],
+  },
+
+  // Always leave this as last one,
+  // but you can also remove it
+  {
+    path: '/:catchAll(.*)*',
+    component: () => import('pages/ErrorNotFound.vue'),
+  },
+]
+
+export default routes
