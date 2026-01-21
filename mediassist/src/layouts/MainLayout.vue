@@ -53,16 +53,10 @@ const linksList = [
     link: '/#/unospacijenta',
   },
   {
-    title: 'Dorijan Šepić',
-    caption: 'Dio',
+    title: 'Register',
+    caption: 'Dorijan Šepić',
     icon: 'school',
-    link: '/',
-  },
-  {
-    title: 'Daniel Smoković',
-    caption: 'Dio',
-    icon: 'school',
-    link: '/',
+    link: '/#/Registracija',
   }
 ]
 
