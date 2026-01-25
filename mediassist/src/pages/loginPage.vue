@@ -50,7 +50,10 @@ export default {
           const response = await axios.post('http://localhost:3000/api/login', {
             email: email.value,
             lozinka: password.value
-          })
+          });
+
+          localStorage.setItem('token', response.data.token)
+          console.log('Token spremljen:', response.data.token)
 
           $q.notify({
             color: 'green-4',
@@ -59,8 +62,6 @@ export default {
             message: 'Prijava uspješna!'
           })
 
-          // spremanje tokena u localstorage
-          console.log('Token:', response.data.token)
 
         } catch (error) {
           // Ako backend vrati grešku (npr. neispravna lozinka)

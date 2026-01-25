@@ -1,6 +1,5 @@
 const express = require("express");
 const cors = require("cors");
-const bodyParser = require("body-parser");
 const mysql = require("mysql2");
 const bcrypt =require("bcrypt");
 const { getDB, connectDB } = require("./db");
@@ -13,15 +12,49 @@ const port = 3000;
 
 app.use(cors());
 app.use(express.json());
-app.use(bodyParser.json());
-
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 
 (async () => {
   await connectDB();
 })();
 
-app.use(express.urlencoded({ extended: true }));
+// funkcija za provjeru JWT-a
+const provjeriToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) return res.status(401).json({ message: "Pristup odbijen. Token nedostaje." });
+
+  jwt.verify(token, SECRET, (err, user) => {
+    if (err) return res.status(403).json({ message: "Neispravan ili istekao token." });
+    
+    req.korisnik = user; 
+    next();
+  });
+};
+
+
+
+app.post("/api/unosmjerenja", provjeriToken, async (req, res) => {
+  const db = getDB();
+
+  const { id_pacijent, tlak_gornji, tlak_donji, puls, temperatura } = req.body;
+
+  const id_korisnik = req.korisnik.id; 
+
+  console.log(`Spremam mjerenje: Pacijent ${id_pacijent}, Korisnik ${id_korisnik}`);
+
+  const sql = `INSERT INTO MJERENJA (id_pacijent, id_korisnik, tlak_gornji, tlak_donji, puls, temperatura, datum) 
+               VALUES (?, ?, ?, ?, ?, ?, NOW())`;
+
+  try {
+    await db.query(sql, [id_pacijent, id_korisnik, tlak_gornji, tlak_donji, puls, temperatura]);
+    res.json({ success: true, message: "Spremljeno u bazu!" });
+  } catch (err) {
+    console.error("Greška pri unosu:", err.sqlMessage);
+    res.status(500).json({ message: "Greška u bazi", detalji: err.sqlMessage });
+  }
+});
 
 app.get("/api/pacijenti", async (req, res) => {
   const db = getDB();
@@ -33,6 +66,22 @@ app.get("/api/pacijenti", async (req, res) => {
   }
 });
 
+app.post("/api/unosrecepta", provjeriToken, async (req, res) => {
+  const { id_pacijent, naziv_lijeka, doziranje, napomena } = req.body;
+  const id_korisnik = req.korisnik.id;
+  const db = getDB();
+
+  try {
+    const sql = `INSERT INTO RECEPTI (id_pacijent, id_korisnik, naziv_lijeka, doziranje, napomena) 
+                 VALUES (?, ?, ?, ?, ?)`;
+    
+    await db.query(sql, [id_pacijent, id_korisnik, naziv_lijeka, doziranje, napomena]);
+    res.json({ success: true, message: "Recept uspješno izdan!" });
+  } catch (error) {
+    console.error("SQL GREŠKA:", error.sqlMessage);
+    res.status(500).json({ message: "Greška pri spremanju recepta", detalji: error.sqlMessage });
+  }
+});
 
 app.post("/api/unospacijenta", async (request, response) => {
   const data = request.body;

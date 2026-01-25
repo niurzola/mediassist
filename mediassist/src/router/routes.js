@@ -6,7 +6,9 @@ const routes = [
               { path: 'Registracija', component: () => import('pages/RegistracijaPage.vue') },
               { path: 'Pacijenti', component: () => import('pages/PregledPacijenta.vue') },
               { path: 'unospacijenta', component: () => import('pages/UnosPacijenta.vue') },
-              { path: 'loginPage', component: () => import('pages/loginPage.vue') }
+              { path: 'loginPage', component: () => import('pages/loginPage.vue') },
+              { path: 'mjerenja', component: () => import('pages/UnosMjerenja.vue') },
+              { path: 'recepti', component: () => import('pages/UnosRecepta.vue') },
 
     ],
   },
