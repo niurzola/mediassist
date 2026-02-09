@@ -66,6 +66,17 @@ app.get("/api/pacijenti", async (req, res) => {
   }
 });
 
+app.get("/api/termini", async (req, res) => {
+  const db = getDB();
+  try {
+    const [results] = await db.query("SELECT * FROM Termin");
+    res.send(results);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+
 app.get("/api/svaMjerenja", async (req, res) => {
   const db = getDB();
   try {

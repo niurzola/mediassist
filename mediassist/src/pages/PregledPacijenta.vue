@@ -15,7 +15,7 @@
         bordered
         :rows="pacijenti"
         :columns="columns"
-        row-key="ID_PACIJENTA"
+        row-key="ID_Pacijenta"
         :wrap-cells="true"
       />
     </div>
@@ -30,9 +30,9 @@ let pacijenti = ref([])
 let prikaziTablicu= ref(false)
 
 const columns = [
-  { name: 'ID_Pacijenta', label: 'ID', field: 'ID_PACIJENTA', align: 'left' },
+  { name: 'ID_Pacijenta', label: 'ID', field: 'ID_Pacijenta', align: 'left' },
   { name: 'Ime_pacijent', label: 'Ime', field: 'Ime_pacijent', align: 'left' },
-  { name: 'Prezime_pacijent', label: 'Prezime', field: 'Prezime_pacijent', align: 'left' },
+  { name: 'Prezime_pacijenta', label: 'Prezime', field: 'Prezime_pacijenta', align: 'left' },
   { name: 'DOB_Pacijent', label: 'Dob', field: 'DOB_Pacijent', align: 'left' },
   { name: 'Spol_pacijent', label: 'Spol', field: 'Spol_pacijent', align: 'left' }
 ]
