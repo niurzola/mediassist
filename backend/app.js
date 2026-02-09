@@ -104,6 +104,17 @@ app.post("/api/unospacijenta", async (request, response) => {
     response.status(500).send(error);
   }
 });
+app.post("/api/unostermina", async (request, response) => {
+  const data = request.body;
+  termin = [[data.datum, data.vrijeme, data.id]]
+  const db = getDB();
+  try {
+    const [results] = await db.query(" INSERT INTO Termin (Datum, Vrijeme, ID_Pacijenta) VALUES ?", [termin]);
+    response.send(results);
+  } catch (error) {
+    response.status(500).send(error);
+  }
+});
 
 app.post("/api/registracija", async (req, res) => {
   try {

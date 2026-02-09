@@ -77,6 +77,12 @@ const linksList = [
     caption: 'Dorijan Šepić',
     icon: 'school',
     link: '/#/recepti',
+  },
+  {
+    title: 'Termin',
+    caption: 'Noa Iurzola',
+    icon: 'timer',
+    link: '/#/unostermina',
   }
 ]
 
