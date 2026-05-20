@@ -1,8 +1,8 @@
 <template>
   <q-page padding>
     <div class="q-pa-md" style="max-width: 500px; margin: 0 auto;">
-      <q-btn 
-        label="Prikaži tablicu" 
+      <q-btn
+        label="Prikaži tablicu"
         color="primary"
         @click="prikaziTablicu = !prikaziTablicu"
         class="q-mb-md"
@@ -34,10 +34,6 @@
           <q-input filled v-model.number="temperatura" type="number" step="0.1" label="Temperatura" />
 
           <q-btn label="Spremi mjerenje" type="submit" color="secondary" icon="save" class="full-width" />
-<<<<<<< HEAD
-=======
-
->>>>>>> 6806f393f00d263ef428326f77a8946dbf84f941
         </q-form>
       </q-card>
         <q-table
@@ -97,14 +93,8 @@ async function loadMjerenja() {
   } catch (error) {
     console.error(error)
   }
-}
 
-<<<<<<< HEAD
-=======
-async function pohraniMjerenje() {
-  console.log("Gumb kliknut. Trenutno odabrani pacijent:", odabraniPacijent.value)
 
->>>>>>> 6806f393f00d263ef428326f77a8946dbf84f941
   // je li išta odabrano
   if (!odabraniPacijent.value) {
     Notify.create({ type: 'negative', message: 'Niste odabrali pacijenta!' })

@@ -77,32 +77,7 @@ app.get("/api/pacijenti", provjeriToken, provjeriUlogu("zdravstveni_radnik"), as
   }
 });
 
-<<<<<<< HEAD
 app.post("/api/unosrecepta", provjeriToken, provjeriUlogu("zdravstveni_radnik"), async (req, res) => {
-=======
-app.get("/api/termini", async (req, res) => {
-  const db = getDB();
-  try {
-    const [results] = await db.query("SELECT * FROM Termin");
-    res.send(results);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
-
-app.get("/api/svaMjerenja", async (req, res) => {
-  const db = getDB();
-  try {
-    const [results] = await db.query("SELECT * FROM MJERENJA");
-    res.send(results);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
-app.post("/api/unosrecepta", provjeriToken, async (req, res) => {
->>>>>>> 6806f393f00d263ef428326f77a8946dbf84f941
   const { id_pacijent, naziv_lijeka, doziranje, napomena } = req.body;
   const id_korisnik = req.korisnik.id;
   const db = getDB();
