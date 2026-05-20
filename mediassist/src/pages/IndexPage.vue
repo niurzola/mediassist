@@ -40,6 +40,16 @@
           to="/recepti"
           class="full-width"
         />
+        <q-btn
+          unelevated
+          rounded
+          color="grey-6"
+          size="lg"
+          label="Zakazivanje termina"
+          icon="timer"
+          to="/UnosTermina"
+          class="full-width"
+        />
 
         <q-btn
           outline
