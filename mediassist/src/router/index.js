@@ -33,5 +33,27 @@ export default defineRouter(function (/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE),
   })
 
+  Router.beforeEach((to, from, next) => {
+  const userRole = localStorage.getItem('user_role')
+
+
+  if (to.path === '/login') {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user_role')
+    return next()
+  }
+
+  if (to.meta.requiresRole) {
+    if (userRole === to.meta.requiresRole) {
+      next()
+    } else {
+      console.warn(`Access denied. Role needed: ${to.meta.requiresRole}. Got: ${userRole}`)
+      next('/unauthorized')
+    }
+  } else {
+    next()
+  }
+})
+
   return Router
 })

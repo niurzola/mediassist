@@ -26,7 +26,7 @@
           <q-input filled v-model.number="puls" type="number" label="Puls" />
           <q-input filled v-model.number="temperatura" type="number" step="0.1" label="Temperatura" />
 
-          <q-btn label="Spremi mjerenje" type="submit" color="primary" icon="save" class="full-width" />
+          <q-btn label="Spremi mjerenje" type="submit" color="secondary" icon="save" class="full-width" />
         </q-form>
       </q-card>
     </div>
@@ -58,18 +58,18 @@ onMounted(async () => {
 async function pohraniMjerenje() {
   console.log("Gumb kliknut. Trenutno odabrani pacijent (v-model):", odabraniPacijent.value)
 
-  // 1. Provjera je li išta odabrano
+  // je li išta odabrano
   if (!odabraniPacijent.value) {
     Notify.create({ type: 'negative', message: 'Niste odabrali pacijenta!' })
     return
   }
 
-  // 2. Izvlačenje ID-a (tražimo bilo koju verziju naziva jer MySQL zna varirati)
+  // Izvlačenje ID-a
   let finalId = null
   if (typeof odabraniPacijent.value === 'object') {
     finalId = odabraniPacijent.value.ID_PACIJENTA || odabraniPacijent.value.id_pacijent || odabraniPacijent.value.ID_Pacijenta
   } else {
-    finalId = odabraniPacijent.value // Ako je ipak spremljen samo broj
+    finalId = odabraniPacijent.value
   }
 
   console.log("Izvučeni ID pacijenta za slanje:", finalId)

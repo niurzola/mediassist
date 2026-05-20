@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const mysql = require("mysql2");
-const bcrypt =require("bcrypt");
+const bcrypt = require("bcrypt");
 const { getDB, connectDB } = require("./db");
 const jwt = require("jsonwebtoken");
 
@@ -18,7 +18,7 @@ app.use(express.urlencoded({ extended: true }));
   await connectDB();
 })();
 
-// funkcija za provjeru JWT-a
+// Funkcija za provjeru JWT-a
 const provjeriToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
@@ -28,18 +28,29 @@ const provjeriToken = (req, res, next) => {
   jwt.verify(token, SECRET, (err, user) => {
     if (err) return res.status(403).json({ message: "Neispravan ili istekao token." });
     
-    req.korisnik = user; 
+    req.korisnik = user; // Ovdje se spremaju id, email i uloga iz tokena
     next();
   });
 };
 
+// Middleware koji provjerava ima li korisnik pravo pristupa (Mora ići NAKON provjeriToken)
+function provjeriUlogu(potrebnaUloga) {
+  return (req, res, next) => {
+    // FIX: Prilagođeno da čita iz 'req.korisnik' kojeg postavlja 'provjeriToken' middleware
+    const korisnikUloga = req.korisnik?.uloga; 
 
+    if (korisnikUloga !== potrebnaUloga) {
+      return res.status(403).json({ message: "Nemate ovlasti za ovu akciju." });
+    }
 
+    next(); 
+  };
+}
+
+// Rute s provjerama uloga
 app.post("/api/unosmjerenja", provjeriToken, async (req, res) => {
   const db = getDB();
-
   const { id_pacijent, tlak_gornji, tlak_donji, puls, temperatura } = req.body;
-
   const id_korisnik = req.korisnik.id; 
 
   console.log(`Spremam mjerenje: Pacijent ${id_pacijent}, Korisnik ${id_korisnik}`);
@@ -56,7 +67,7 @@ app.post("/api/unosmjerenja", provjeriToken, async (req, res) => {
   }
 });
 
-app.get("/api/pacijenti", async (req, res) => {
+app.get("/api/pacijenti", provjeriToken, provjeriUlogu("zdravstveni_radnik"), async (req, res) => {
   const db = getDB();
   try {
     const [results] = await db.query("SELECT * FROM PACIJENT");
@@ -66,7 +77,7 @@ app.get("/api/pacijenti", async (req, res) => {
   }
 });
 
-app.post("/api/unosrecepta", provjeriToken, async (req, res) => {
+app.post("/api/unosrecepta", provjeriToken, provjeriUlogu("zdravstveni_radnik"), async (req, res) => {
   const { id_pacijent, naziv_lijeka, doziranje, napomena } = req.body;
   const id_korisnik = req.korisnik.id;
   const db = getDB();
@@ -83,9 +94,9 @@ app.post("/api/unosrecepta", provjeriToken, async (req, res) => {
   }
 });
 
-app.post("/api/unospacijenta", async (request, response) => {
+app.post("/api/unospacijenta", provjeriToken, provjeriUlogu("zdravstveni_radnik"), async (request, response) => {
   const data = request.body;
-  pacijent = [[data.ime, data.prezime, data.dob, data.spol]]
+  const pacijent = [[data.ime, data.prezime, data.dob, data.spol]];
   const db = getDB();
   try {
     const [results] = await db.query("INSERT INTO PACIJENT (Ime_pacijent, Prezime_pacijenta, DOB_Pacijent, Spol_pacijent) VALUES ?", [pacijent]);
@@ -98,8 +109,7 @@ app.post("/api/unospacijenta", async (request, response) => {
 app.post("/api/registracija", async (req, res) => {
   try {
     console.log("Incoming data:", req.body);
-
-    const { ime, prezime, email, lozinka } = req.body;
+    const { ime, prezime, email, lozinka, uloga } = req.body;
 
     if (!email || !lozinka) {
       return res.status(400).json({ message: "Email i lozinka su obavezni" });
@@ -107,26 +117,27 @@ app.post("/api/registracija", async (req, res) => {
 
     const db = getDB();
 
-    const [exists] = await db.query(
+    // FIX: Maknute uglate zagrade oko 'exists' da ispravno provjeravamo duljinu niza rows
+    const [rows] = await db.query(
       "SELECT * FROM korisnici WHERE email = ?",
       [email]
     );
 
-    if (exists.length > 0) {
+    if (rows.length > 0) {
       return res.status(400).json({ message: "Korisnik već postoji" });
     }
 
     const hashed = await bcrypt.hash(lozinka, 10);
 
     await db.query(
-      "INSERT INTO korisnici (ime, prezime, email, password) VALUES (?, ?, ?, ?)",
-      [ime, prezime, email, hashed]
+      "INSERT INTO korisnici (ime, prezime, email, password, uloga) VALUES (?, ?, ?, ?, ?)",
+      [ime, prezime, email, hashed, uloga || 'korisnik']
     );
 
     res.json({ message: "Registracija uspješna" });
 
   } catch (error) {
-    console.error("Error hashing password:", error);
+    console.error("Error during registration:", error);
     res.status(500).json({ message: "Greška na serveru" });
   }
 });
@@ -146,28 +157,30 @@ app.post("/api/login", async (req, res) => {
     }
 
     const user = rows[0];
-
     const valid = await bcrypt.compare(lozinka, user.password);
 
     if (!valid) {
       return res.status(400).json({ message: "Neispravan email ili lozinka" });
     }
 
+    // FIX: Dodana uloga unutar JWT tokena kako bi je middleware mogao čitati
     const token = jwt.sign(
-      { id: user.id, email: user.email },
+      { id: user.id, email: user.email, uloga: user.uloga },
       SECRET,
       { expiresIn: "1h" }
     );
 
-    res.json({ message: "Prijava uspješna", token });//Vraćanje tokena klijentu
+    // FIX: Eksplicitno vraćamo i ulogu prema Quasar frontend aplikaciji
+    res.json({ 
+      message: "Prijava uspješna", 
+      token, 
+      uloga: user.uloga 
+    });
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ message: "Greška na serveru" });
   }
-
 });
-
-
 
 app.listen(port, () => {
     console.log("Server running at port: " + port);

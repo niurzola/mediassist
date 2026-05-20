@@ -1,7 +1,8 @@
 <template>
   <q-page padding>
     <div class="q-pa-md" style="max-width: 400px">
-      <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
+      <!-- Added .prevent modifier to form submission -->
+      <q-form @submit.prevent="onSubmit" @reset="onReset" class="q-gutter-md">
         <q-input
           filled
           v-model="email"
@@ -31,11 +32,13 @@
 <script>
 import { useQuasar } from 'quasar'
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import axios from 'axios'
 
 export default {
   setup () {
     const $q = useQuasar()
+    const router = useRouter()
 
     const email = ref(null)
     const password = ref(null)
@@ -46,14 +49,17 @@ export default {
 
       async onSubmit () {
         try {
-          // Šaljemo podatke na rutu u app.js
           const response = await axios.post('http://localhost:3000/api/login', {
             email: email.value,
             lozinka: password.value
           });
 
+          // token i user_role to localStorage
           localStorage.setItem('token', response.data.token)
-          console.log('Token spremljen:', response.data.token)
+
+          localStorage.setItem('user_role', response.data.uloga)
+
+          console.log('Prijava uspješna. Uloga:', response.data.uloga)
 
           $q.notify({
             color: 'green-4',
@@ -62,9 +68,17 @@ export default {
             message: 'Prijava uspješna!'
           })
 
+          // 4. Redirect based on role
+          if (response.data.uloga === 'zdravstveni_radnik') {
+            router.push('/pregled-pacijenta')
+          } else {
+            router.push('/') // Send users to index homepage
+          }
 
         } catch (error) {
-          // Ako backend vrati grešku (npr. neispravna lozinka)
+          localStorage.removeItem('token')
+          localStorage.removeItem('user_role')
+
           $q.notify({
             color: 'red-5',
             textColor: 'white',
