@@ -36,7 +36,7 @@ const columns = [
   {
     name: 'id_pacijenta',
     label: 'ID',
-    field: 'id_pacijenta',
+    field: 'ID_Pacijenta',
     align: 'left',
     sortable: true
   },
