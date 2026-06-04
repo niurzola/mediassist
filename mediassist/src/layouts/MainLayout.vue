@@ -60,12 +60,18 @@
     </q-header>
 
     <q-drawer v-model="leftDrawerOpen" show-if-above bordered class="bg-grey-1">
-      <q-list>
-        <q-item-label header class="text-primary text-weight-bold text-uppercase">
-          Poveznice
-        </q-item-label>
-        <EssentialLink v-for="link in linksList" :key="link.title" v-bind="link" />
-      </q-list>
+      <div class="column full-height justify-between">
+        <q-list>
+          <q-item-label header class="text-primary text-weight-bold text-uppercase">
+            Poveznice
+          </q-item-label>
+          <EssentialLink v-for="link in linksList" :key="link.title" v-bind="link" />
+        </q-list>
+        <div>
+          <q-separator />
+          <EssentialLink v-bind="prirucnikLink" />
+        </div>
+      </div>
     </q-drawer>
 
     <q-page-container>
@@ -112,6 +118,8 @@ const linksList = [
   { title: 'Recepti', caption: 'Dorijan Šepić', icon: 'medication', link: '/recepti' },
   { title: 'Termin', caption: 'Noa Iurzola', icon: 'timer', link: '/termini' }
 ]
+
+const prirucnikLink = { title: 'Priručnik', caption: 'Korisnički priručnik', icon: 'menu_book', link: '/prirucnik' }
 
 const jePrijavljen = computed(() => !!token.value)
 

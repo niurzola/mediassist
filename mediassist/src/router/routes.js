@@ -10,7 +10,8 @@ const routes = [
               { path: 'mjerenja', component: () => import('pages/UnosMjerenja.vue') },
               { path: 'recepti', component: () => import('pages/UnosRecepta.vue') },
               {path: 'termini', component: () => import('pages/UnosTermina.vue') },
-              { path: 'tiketi', component: () => import('pages/TiketiPage.vue') }
+              { path: 'tiketi', component: () => import('pages/TiketiPage.vue') },
+              { path: 'prirucnik', component: () => import('pages/KorisnickiPrirucnik.vue') }
 
     ],
   },
