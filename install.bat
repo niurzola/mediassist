@@ -65,7 +65,7 @@ REM === Pokretanje servera ===
 echo [4/4] Pokrecem servere...
 
 cd /d "%~dp0backend"
-start "MediAssist Backend" cmd /c "node app.js"
+start "MediAssist Backend" cmd /c "node server.js"
 
 timeout /t 3 /nobreak >nul
 

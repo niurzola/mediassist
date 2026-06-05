@@ -83,10 +83,13 @@ app.post("/api/unosmjerenja", provjeriToken, async (req, res) => {
 
 app.get("/api/pacijenti", provjeriToken, provjeriUlogu("zdravstveni_radnik"), async (req, res) => {
   const db = getDB();
+  console.log("[BACKEND] Dohvaćanje svih pacijenata");
   try {
     const [results] = await db.query("SELECT * FROM PACIJENT");
+    console.log("[BACKEND] Pronađeno pacijenata:", results.length);
     res.send(results);
   } catch (error) {
+    console.error("[BACKEND] SQL GREŠKA NA /api/pacijenti:", error.sqlMessage || error.message);
     res.status(500).send(error);
   }
 });
@@ -128,10 +131,13 @@ app.post("/api/unospacijenta", provjeriToken, provjeriUlogu("zdravstveni_radnik"
   const data = request.body;
   const pacijent = [[data.ime, data.prezime, data.dob, data.spol]];
   const db = getDB();
+  console.log("[BACKEND] Pokušaj unosa pacijenta:", data.ime, data.prezime);
   try {
     const [results] = await db.query("INSERT INTO PACIJENT (Ime_pacijent, Prezime_pacijenta, DOB_Pacijent, Spol_pacijent) VALUES ?", [pacijent]);
+    console.log("[BACKEND] Pacijent unesen, insertId:", results.insertId);
     response.send(results);
   } catch (error) {
+    console.error("[BACKEND] SQL GREŠKA NA /api/unospacijenta:", error.sqlMessage || error.message);
     response.status(500).send(error);
   }
 });
@@ -608,6 +614,4 @@ app.get("/api/obavijesti", provjeriToken, async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-    console.log("Server running at port: " + port);
-});
+module.exports = app;
