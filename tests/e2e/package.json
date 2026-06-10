@@ -1,0 +1,15 @@
+{
+  "name": "mediassist-e2e-tests",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "jest --verbose --detectOpenHandles",
+    "test:watch": "jest --watch"
+  },
+  "devDependencies": {
+    "axios": "^1.13.2",
+    "chromedriver": "^148.0.0",
+    "jest": "^30.4.2",
+    "selenium-webdriver": "^4.30.0"
+  }
+}
